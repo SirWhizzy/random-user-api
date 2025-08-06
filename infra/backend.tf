@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "api-infra"
+    bucket = "terra-backend-files"
     key    = "dev/terraform.tfstate"
-    region = "eu-north-1"
+    region = "us-east-1"
   }
 }

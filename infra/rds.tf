@@ -1,4 +1,4 @@
-# Redshift security group
+# RDS security group
 resource "aws_security_group" "rds-security-group" {
   name        = "randomuser-security-group"
   description = "Security Group"
