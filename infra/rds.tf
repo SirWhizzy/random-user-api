@@ -30,15 +30,13 @@ resource "aws_db_subnet_group" "rds-subnet-group" {
 
 resource "random_password" "rds-password" {
   length           = 16
-  override_special = "()!#$%&_+-={}|"
-  special          = true
   numeric          = true
   upper            = true
   lower            = true
 }
 
 resource "aws_secretsmanager_secret" "rds-admin-secrets" {
-  name                    = "randomuser/dev/rds-admin-credentials/"
+  name                    = "randomuser/dev/rds-admin-cluster-credentials/"
   description             = "Admin credentials for the rds cluster"
 }
 
@@ -64,7 +62,7 @@ resource "aws_db_instance" "rds-instance" {
   engine                  = "postgres"
   engine_version          = "16.4"
   instance_class          = "db.m5.large"
-  db_name                 = "mydb"
+  db_name                 = "random_user"
   port                    = 5432
   publicly_accessible     = true
   allocated_storage       = 30

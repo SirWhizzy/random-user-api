@@ -9,8 +9,6 @@ resource "aws_ssm_parameter" "redshift_db_username" {
 # PASSWORD AND SECRETS
 resource "random_password" "redshift_password" {
   length           = 16
-  override_special = "()!#$%&_+-={}|" # A list of special characters that will be used in creating the password
-  special          = true
   numeric          = true
   upper            = true
 }
