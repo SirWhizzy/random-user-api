@@ -9,8 +9,8 @@ resource "aws_vpc_security_group_ingress_rule" "rds-ingress-rule" {
   security_group_id = aws_security_group.rds-security-group.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 5432
-  ip_protocol       = "tcp"
   to_port           = 5432
+  ip_protocol       = "tcp"
 }
 
 resource "aws_vpc_security_group_egress_rule" "rds-egress-rule" {
@@ -28,37 +28,39 @@ resource "aws_db_subnet_group" "rds-subnet-group" {
   ]
 }
 
-resource "random_password" "rds-password" {
-  length           = 16
+
+#USERNAME
+resource "aws_ssm_parameter" "rds_db_username" {
+  name  = "rds_db_username"
+  type  = "String"
+  value = "rds_user"
+}
+
+#PASSWORD
+resource "random_password" "rds_db_password" {
+  length           = 12
   numeric          = true
   upper            = true
   lower            = true
 }
 
-resource "aws_secretsmanager_secret" "rds-admin-secrets" {
-  name                    = "randomuser/dev/rds-admin-cluster-credentials/"
-  description             = "Admin credentials for the rds cluster"
+resource "aws_ssm_parameter" "rds_db_password" {
+  name  = "rds_db_password"
+  type  = "String"
+  value = random_password.rds_db_password.result
 }
 
-resource "aws_secretsmanager_secret_version" "rds-admin-secrets-version" {
-  secret_id = aws_secretsmanager_secret.rds-admin-secrets.id
-  secret_string = jsonencode({
-    username = "randomuser_rds_admin"
-    password = random_password.rds-password.result
-  })
-}
 
 resource "aws_db_parameter_group" "rds-param-group" {
   name        = "randomuser-rds-parameter-group"
   family      = "postgres16"
   description = "Disable SSL"
-
 }
 
 resource "aws_db_instance" "rds-instance" {
   identifier              = "randomuser-db-instance"
-  username                = "randomuser_admin"
-  password                = random_password.rds-password.result
+  username                = aws_ssm_parameter.rds_db_username.value
+  password                = aws_ssm_parameter.rds_db_password.value
   engine                  = "postgres"
   engine_version          = "16.4"
   instance_class          = "db.m5.large"
